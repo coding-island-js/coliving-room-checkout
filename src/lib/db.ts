@@ -14,3 +14,9 @@ export async function ensureSchema() {
   )`;
   await sql`create unique index if not exists one_live_hold_per_room on holds (room_id) where status = 'held'`;
 }
+
+// Rooms with a live hold right now, and when each hold ends. Used to show "Held" on the page.
+export async function liveHolds(now = new Date()): Promise<Map<string, Date>> {
+  const rows = await sql`select room_id, expires_at from holds where status = 'held' and expires_at > ${now}`;
+  return new Map(rows.map((r) => [r.room_id as string, new Date(r.expires_at)]));
+}

@@ -5,6 +5,10 @@ for 45 minutes, and Stripe takes the move-in fee and starts recurring rent.
 
 Built with **Next.js, Stripe (test mode), Postgres and Zod**, and tested.
 
+**Live demo: https://coliving-demo.withmagic.ai** (Stripe test mode). Pay with card `4242 4242 4242 4242`,
+any future date, any CVC. Try the code `DEMO10` on the payment page for 10% off. A room someone is paying for
+shows as "Held for 45 minutes" until they pay, leave the payment page, or the hold runs out.
+
 ## The rules it enforces
 
 - **A room is bookable only when its Room Directory status is VACANT.** Room data is read through one small
@@ -49,5 +53,6 @@ Then `npm install`, `npx vitest run`, and `npm run dev`.
 | `src/lib/checkout.ts` | Checkout rules, the hold, Stripe session, Stripe notices |
 | `src/lib/rooms.ts` | The Room Directory adapter (sample file here, ClickUp in production) |
 | `src/lib/db.ts` | The holds table |
-| `src/app/api/checkout/route.ts`, `src/app/api/webhooks/stripe/route.ts` | The two endpoints |
+| `src/app/api/checkout/route.ts`, `src/app/api/webhooks/stripe/route.ts` | Start checkout, and Stripe's notices |
+| `src/app/api/holds/release/route.ts` | Frees the room when a member leaves the payment page without paying |
 | `tests/checkout.test.ts` | The 12 tests |

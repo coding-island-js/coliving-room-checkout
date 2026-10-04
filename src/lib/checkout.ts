@@ -85,7 +85,7 @@ export async function startCheckout(raw: unknown, now = new Date()): Promise<Che
       custom_text: { submit: { message: "The move-in fee is non-refundable. Your room is held for 45 minutes." } },
       metadata: { holdId: String(holdId), roomId: room.id, memberName: input.name, memberPhone: input.phone, moveInDate: input.moveInDate },
       success_url: `${process.env.BASE_URL ?? "http://localhost:3000"}/?booked=1`,
-      cancel_url: `${process.env.BASE_URL ?? "http://localhost:3000"}/?room=${room.id}`,
+      cancel_url: `${process.env.BASE_URL ?? "http://localhost:3000"}/?left=${holdId}`,
     });
     await sql`update holds set stripe_session_id = ${session.id} where id = ${holdId}`;
     return { ok: true, url: session.url!, holdId };
@@ -109,4 +109,18 @@ export async function handleStripeEvent(event: Stripe.Event) {
     return "released";
   }
   return "ignored";
+}
+
+// The member left Stripe's page without paying. Close that checkout and free the room now,
+// instead of making everyone wait out the 45 minutes.
+export async function releaseHold(holdId: number) {
+  const [hold] = await sql`select stripe_session_id from holds where id = ${holdId} and status = 'held'`;
+  if (!hold) return false;
+  if (hold.stripe_session_id) {
+    const session = await stripe.checkout.sessions.retrieve(hold.stripe_session_id);
+    if (session.status !== "open") return false; // paid or already closed: leave it to Stripe's notice
+    await stripe.checkout.sessions.expire(hold.stripe_session_id);
+  }
+  await sql`update holds set status = 'released' where id = ${holdId} and status = 'held'`;
+  return true;
 }
