@@ -1,0 +1,8 @@
+[
+  { "id": "rd-101", "property": "Oak Lawn House", "name": "Room 1, private bath", "status": "VACANT",
+    "rentCents": { "weekly": 26500, "biweekly": 51000, "monthly": 109500 }, "moveInFeeCents": 15000 },
+  { "id": "rd-102", "property": "Oak Lawn House", "name": "Room 2, shared bath", "status": "OCCUPIED",
+    "rentCents": { "weekly": 22500, "biweekly": 43000, "monthly": 92500 }, "moveInFeeCents": 15000 },
+  { "id": "rd-201", "property": "Lakewood House", "name": "Room 4, shared bath", "status": "VACANT",
+    "rentCents": { "weekly": 21000, "biweekly": 40000, "monthly": 86500 }, "moveInFeeCents": 12500 }
+]
